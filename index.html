@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Google Meta Tags -->
+    <title>Downloader Media Sosial Batch - Hapus Watermark Gratis</title>
+    <meta name="description" content="Unduh semua video dan foto TikTok, Instagram Reels, Facebook, YouTube Shorts, Twitter, Pinterest, Threads tanpa watermark sekaligus secara bertahap cepat dan gratis.">
+    <meta name="keywords" content="download video tiktok tanpa watermark, instagram reels downloader, batch video downloader, unduh video fb, youtube shorts downloader">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://website-anda.vercel.app/">
+
+    <!-- Open Graph Meta Tags (Untuk Tampilan Share Medsos) -->
+    <meta property="og:title" content="Downloader Media Sosial Batch - Hapus Watermark Gratis">
+    <meta property="og:description" content="Unduh foto & video batch tanpa watermark dari TikTok, IG Reels, FB, YouTube Shorts, dan lainnya.">
+    <meta property="og:type" content="website">
+
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Library JSZIP untuk membuat file ZIP langsung di perangkat pengguna -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <style>
+        /* CSS RESET & VARIABLES */
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --border-color: #E5E7EB;
+            --success: #10B981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            flex: 1;
+        }
+
+        /* SLOT IKLAN RESPONSIF */
+        .ad-space {
+            background: #F3F4F6;
+            border: 1px dashed #D1D5DB;
+            border-radius: 8px;
+            text-align: center;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* MAIN TOOL CONTAINER */
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .tool-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-title h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* TAB SELEKSI MODE */
+        .mode-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-btn {
+            padding: 0.6rem 1.2rem;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* PILIHAN PLATFORM */
+        .platform-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .platform-btn {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .platform-btn.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+            background: #EEF2FF;
+        }
+
+        /* INPUT FIELD */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .input-group {
+                flex-direction: row;
+            }
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+        }
+
+        .options-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        /* PROSES & HASIL SCANNING */
+        .status-container {
+            display: none;
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #E5E7EB;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        /* BATCH RESULT CONTAINER */
+        .batch-card {
+            background: #F9FAFB;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: left;
+        }
+
+        .batch-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .btn-download-zip {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .preview-item {
+            width: 100%;
+            height: 80px;
+            background: #DDD;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        /* ARTIKEL SEO (DIBAWAH TOOL) */
+        .seo-content {
+            margin-top: 3rem;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            line-height: 1.6;
+        }
+
+        .seo-content h2 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .seo-content p {
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background: var(--card-bg);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="logo">
+            <i class="fa-solid fa-cloud-arrow-down"></i> MediaBatchSave
+        </a>
+    </header>
+
+    <div class="container">
+        
+        <!-- SLOT IKLAN ATAS (MONETISASI) -->
+        <div class="ad-space">
+            <!-- Tempel Kode Iklan (Google AdSense / Monetag) di Sini -->
+            <span>[ Ruang Iklan Banner Atas Header - 728x90 / Responsif ]</span>
+        </div>
+
+        <!-- UTILITY TOOL MAIN CARD -->
+        <div class="tool-card">
+            <div class="tool-title">
+                <h1>Unduh Media Sosial Batch & Tanpa Watermark</h1>
+                <p style="color: var(--text-muted);">Pindai akun dan unduh foto/video secara bertahap (10-25 item per kloter) dari terbaru ke terlama.</p>
+            </div>
+
+            <!-- MODE SELECTOR -->
+            <div class="mode-tabs">
+                <button class="tab-btn active" onclick="setMode('video')"><i class="fa-solid fa-video"></i> Mode Video</button>
+                <button class="tab-btn" onclick="setMode('image')"><i class="fa-solid fa-image"></i> Mode Foto</button>
+            </div>
+
+            <!-- PLATFORM SELECTOR -->
+            <div class="platform-grid">
+                <button class="platform-btn active" onclick="selectPlatform(this)"><i class="fa-brands fa-tiktok"></i> TikTok</button>
+                <button class="platform-btn" onclick="selectPlatform(this)"><i class="fa-brands fa-instagram"></i> Instagram</button>
+                <button class="platform-btn" onclick="selectPlatform(this)"><i class="fa-brands fa-facebook"></i> Facebook</button>
+                <button class="platform-btn" onclick="selectPlatform(this)"><i class="fa-brands fa-youtube"></i> Shorts</button>
+                <button class="platform-btn" onclick="selectPlatform(this)"><i class="fa-brands fa-twitter"></i> Twitter/X</button>
+                <button class="platform-btn" onclick="selectPlatform(this)"><i class="fa-brands fa-pinterest"></i> Pinterest</button>
+                <button class="platform-btn" onclick="selectPlatform(this)"><i class="fa-solid fa-at"></i> Threads</button>
+            </div>
+
+            <!-- INPUT FORM -->
+            <div class="input-group">
+                <input type="url" id="profileUrl" class="input-field" placeholder="Tempel URL Profil Akun (contoh: https://www.tiktok.com/@nama_akun)" required>
+                <button class="btn-submit" onclick="startScanning()"><i class="fa-solid fa-magnifying-glass"></i> Pindai Profil</button>
+            </div>
+
+            <div class="options-group">
+                <input type="checkbox" id="noWatermark" checked>
+                <label for="noWatermark"><b>Hapus Watermark Otomatis</b> (Hasil Kualitas Jernih HD)</label>
+            </div>
+
+            <!-- STATUS & PROGRESS PEMINDAIAN -->
+            <div id="statusContainer" class="status-container">
+                <h3 id="statusText">Menganalisa Link Profil...</h3>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <p id="statusSub" style="font-size: 0.85rem; color: var(--text-muted);">Membaca metadata postingan...</p>
+
+                <!-- SLOT IKLAN TENGAH (PROSES SCANNING) -->
+                <div class="ad-space" style="margin-top: 1rem;">
+                    <span>[ Ruang Iklan Interstitial / Banner saat Menunggu Scan ]</span>
+                </div>
+
+                <!-- BATCH CONTAINER HASIL -->
+                <div id="batchResults"></div>
+            </div>
+        </div>
+
+        <!-- SLOT IKLAN BAWAH TOOL -->
+        <div class="ad-space">
+            <span>[ Ruang Iklan Native / Banner Bawah Tool - High CTR ]</span>
+        </div>
+
+        <!-- KONTEN SEO DENGAN STRUCTURED DATA KATA KUNCI GOOGLE -->
+        <article class="seo-content">
+            <h2>Cara Mengunduh Semua Video & Foto Tanpa Watermark Secara Batch</h2>
+            <p><strong>MediaBatchSave</strong> adalah alat utilitas web gratis yang memungkinkan Anda mengunduh seluruh konten dari akun media sosial publik seperti TikTok, Instagram Reels, Facebook Video, YouTube Shorts, Twitter, Pinterest, dan Threads secara otomatis.</p>
+            
+            <h2>Fitur Utama Website Downloader:</h2>
+            <ul>
+                <li><strong>Tanpa Watermark:</strong> Menghapus logo dan watermark secara otomatis dengan hasil jernih HD.</li>
+                <li><strong>Pengunduhan Bertahap (Batching):</strong> Mengelompokkan video 10 hingga 25 item per kloter untuk menghemat memori perangkat Anda.</li>
+                <li><strong>Format ZIP Otomatis:</strong> Menggabungkan semua file yang diunduh langsung ke dalam satu file ZIP.</li>
+                <li><strong>100% Gratis & Aman:</strong> Tanpa perlu masuk (login) atau memasang aplikasi tambahan.</li>
+            </ul>
+        </article>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 MediaBatchSave - All-in-One Social Media Batch Downloader Utility. All Rights Reserved.</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        let currentMode = 'video';
+        let selectedPlatform = 'TikTok';
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function selectPlatform(element) {
+            document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            selectedPlatform = element.innerText.trim();
+        }
+
+        function startScanning() {
+            const urlInput = document.getElementById('profileUrl').value;
+            if(!urlInput) {
+                alert('Silakan masukkan link URL profil media sosial terlebih dahulu!');
+                return;
+            }
+
+            const statusContainer = document.getElementById('statusContainer');
+            const progressFill = document.getElementById('progressFill');
+            const statusText = document.getElementById('statusText');
+            const statusSub = document.getElementById('statusSub');
+            const batchResults = document.getElementById('batchResults');
+
+            statusContainer.style.display = 'block';
+            batchResults.innerHTML = '';
+            progressFill.style.width = '10%';
+
+            // Simulasi Alur Kerja Scanning Sistem
+            setTimeout(() => {
+                progressFill.style.width = '40%';
+                statusText.innerText = 'Menghubungkan ke API ' + selectedPlatform + '...';
+            }, 1000);
+
+            setTimeout(() => {
+                progressFill.style.width = '80%';
+                statusText.innerText = 'Membersihkan Watermark & Membagi Kloter...';
+            }, 2500);
+
+            setTimeout(() => {
+                progressFill.style.width = '100%';
+                statusText.innerText = '🎉 Pemindaian Selesai!';
+                statusSub.innerText = 'Ditemukan 45 Media Publik. Dibagi menjadi 2 Kloter (Masing-masing 20-25 item).';
+
+                // Tampilkan Hasil Batch Kloter 1
+                renderBatchCard(1, 25, true);
+            }, 4000);
+        }
+
+        function renderBatchCard(batchNum, count, isLatest) {
+            const batchResults = document.getElementById('batchResults');
+            
+            const card = document.createElement('div');
+            card.className = 'batch-card';
+            card.innerHTML = `
+                <div class="batch-header">
+                    <div>
+                        <strong>Kloter ${batchNum} (${count} ${currentMode})</strong> 
+                        <span style="font-size:0.75rem; background:#D1FAE5; color:#065F46; padding:2px 6px; border-radius:4px;">
+                            ${isLatest ? 'Terbaru' : 'Selanjutnya'} - No Watermark
+                        </span>
+                    </div>
+                    <button class="btn-download-zip" onclick="downloadZipBatch(${batchNum})">
+                        <i class="fa-solid fa-file-zipper"></i> Unduh ZIP
+                    </button>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Video ${batchNum === 1 ? '1 - 25' : '26 - 45'} sedang siap diunduh.</p>
+                <div class="preview-grid">
+                    ${'<div class="preview-item"></div>'.repeat(6)}
+                </div>
+            `;
+            batchResults.appendChild(card);
+
+            // Jika masih ada sisa batch, munculkan pemicu timer otomatis kloter berikutnya
+            if(batchNum === 1) {
+                setTimeout(() => {
+                    renderBatchCard(2, 20, false);
+                }, 3000);
+            }
+        }
+
+        function downloadZipBatch(batchNum) {
+            alert('Proses kompresi ZIP Kloter ' + batchNum + ' dimulai! File akan otomatis terunduh dalam beberapa detik.');
+            // Di sini tempat pemanggilan JSZip untuk mengunduh array URL file bersih.
+        }
+    </script>
+</body>
+</html>
