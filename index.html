@@ -408,95 +408,82 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        let currentMode = 'video';
-        let selectedPlatform = 'TikTok';
+const RAPIDAPI_KEY = "bdfc77ca24msh62d4898fd91eee7p1ab8c2jsn2db753de2b8a";
+const RAPIDAPI_HOST = "instagram-downloader-download-instagram-videos-stories1.p.rapidapi.com";
 
-        function setMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-        }
+async function startScanning() {
+    const urlInput = document.getElementById('profileUrl').value;
+    if(!urlInput) {
+        alert('Silakan masukkan link URL profil atau video media sosial terlebih dahulu!');
+        return;
+    }
 
-        function selectPlatform(element) {
-            document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
-            selectedPlatform = element.innerText.trim();
-        }
+    const statusContainer = document.getElementById('statusContainer');
+    const progressFill = document.getElementById('progressFill');
+    const statusText = document.getElementById('statusText');
+    const statusSub = document.getElementById('statusSub');
+    const batchResults = document.getElementById('batchResults');
 
-        function startScanning() {
-            const urlInput = document.getElementById('profileUrl').value;
-            if(!urlInput) {
-                alert('Silakan masukkan link URL profil media sosial terlebih dahulu!');
-                return;
+    statusContainer.style.display = 'block';
+    batchResults.innerHTML = '';
+    progressFill.style.width = '20%';
+    statusText.innerText = 'Menghubungkan ke Server ' + selectedPlatform + '...';
+
+    try {
+        // Pemanggilan API ke RapidAPI
+        const response = await fetch(`https://${RAPIDAPI_HOST}/download?url=${encodeURIComponent(urlInput)}`, {
+            method: 'GET',
+            headers: {
+                'x-rapidapi-key': bdfc77ca24msh62d4898fd91eee7p1ab8c2jsn2db753de2b8a,
+                'x-rapidapi-host': instagram-downloader-download-instagram-videos-stories1.p.rapidapi.com
             }
+        });
 
-            const statusContainer = document.getElementById('statusContainer');
-            const progressFill = document.getElementById('progressFill');
-            const statusText = document.getElementById('statusText');
-            const statusSub = document.getElementById('statusSub');
-            const batchResults = document.getElementById('batchResults');
+        const data = await response.json();
 
-            statusContainer.style.display = 'block';
-            batchResults.innerHTML = '';
-            progressFill.style.width = '10%';
+        progressFill.style.width = '70%';
+        statusText.innerText = 'Memproses & Membersihkan Watermark...';
 
-            // Simulasi Alur Kerja Scanning Sistem
-            setTimeout(() => {
-                progressFill.style.width = '40%';
-                statusText.innerText = 'Menghubungkan ke API ' + selectedPlatform + '...';
-            }, 1000);
+        if (response.ok && data) {
+            progressFill.style.width = '100%';
+            statusText.innerText = '🎉 Pemindaian Berhasil!';
+            statusSub.innerText = 'Media siap diunduh tanpa watermark.';
 
-            setTimeout(() => {
-                progressFill.style.width = '80%';
-                statusText.innerText = 'Membersihkan Watermark & Membagi Kloter...';
-            }, 2500);
-
-            setTimeout(() => {
-                progressFill.style.width = '100%';
-                statusText.innerText = '🎉 Pemindaian Selesai!';
-                statusSub.innerText = 'Ditemukan 45 Media Publik. Dibagi menjadi 2 Kloter (Masing-masing 20-25 item).';
-
-                // Tampilkan Hasil Batch Kloter 1
-                renderBatchCard(1, 25, true);
-            }, 4000);
+            // Menampilkan Hasil Pengunduhan
+            displayResults(data);
+        } else {
+            throw new Error(data.message || 'Gagal mengambil data dari profil.');
         }
 
-        function renderBatchCard(batchNum, count, isLatest) {
-            const batchResults = document.getElementById('batchResults');
-            
-            const card = document.createElement('div');
-            card.className = 'batch-card';
-            card.innerHTML = `
-                <div class="batch-header">
-                    <div>
-                        <strong>Kloter ${batchNum} (${count} ${currentMode})</strong> 
-                        <span style="font-size:0.75rem; background:#D1FAE5; color:#065F46; padding:2px 6px; border-radius:4px;">
-                            ${isLatest ? 'Terbaru' : 'Selanjutnya'} - No Watermark
-                        </span>
-                    </div>
-                    <button class="btn-download-zip" onclick="downloadZipBatch(${batchNum})">
-                        <i class="fa-solid fa-file-zipper"></i> Unduh ZIP
-                    </button>
-                </div>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">Video ${batchNum === 1 ? '1 - 25' : '26 - 45'} sedang siap diunduh.</p>
-                <div class="preview-grid">
-                    ${'<div class="preview-item"></div>'.repeat(6)}
-                </div>
-            `;
-            batchResults.appendChild(card);
+    } catch (error) {
+        progressFill.style.background = '#EF4444'; // Warna Merah untuk Error
+        statusText.innerText = '❌ Terjadi Kesalahan!';
+        statusSub.innerText = error.message || 'Pastikan link profil publik dan valid.';
+    }
+}
 
-            // Jika masih ada sisa batch, munculkan pemicu timer otomatis kloter berikutnya
-            if(batchNum === 1) {
-                setTimeout(() => {
-                    renderBatchCard(2, 20, false);
-                }, 3000);
-            }
-        }
-
-        function downloadZipBatch(batchNum) {
-            alert('Proses kompresi ZIP Kloter ' + batchNum + ' dimulai! File akan otomatis terunduh dalam beberapa detik.');
-            // Di sini tempat pemanggilan JSZip untuk mengunduh array URL file bersih.
-        }
+function displayResults(data) {
+    const batchResults = document.getElementById('batchResults');
+    
+    // Tampilan hasil video/gambar bersih tanpa watermark
+    const card = document.createElement('div');
+    card.className = 'batch-card';
+    card.innerHTML = `
+        <div class="batch-header">
+            <div>
+                <strong>Kloter 1 (Media Terbersihkan)</strong> 
+                <span style="font-size:0.75rem; background:#D1FAE5; color:#065F46; padding:2px 6px; border-radius:4px;">
+                    No Watermark HD
+                </span>
+            </div>
+            <a href="${data.url || data.download_url}" target="_blank" download class="btn-download-zip" style="text-decoration:none;">
+                <i class="fa-solid fa-download"></i> Unduh Media
+            </a>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">${data.title || 'Media Berhasil Diproses'}</p>
+    `;
+    batchResults.appendChild(card);
+}
     </script>
 </body>
 </html>
